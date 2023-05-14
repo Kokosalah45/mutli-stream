@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form id="form">
+      <input type="file" name="" id="up" multiple />
+
+      <pre id="progress"></pre>
+      <button>Submit</button>
+    </form>
+  </body>
+  <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+  <script>
+    const fileInput = document.getElementById('up');
+    const form = document.getElementById('form');
+    const progress = document.getElementById('progress');
+    const fileReader = new FileReader();
+    const formData = new FormData();
+
+    let files = null;
+    fileInput.addEventListener('change', () => {
+      files = fileInput.files;
+      console.log(files);
+    });
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!files) {
+        return;
+      }
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        formData.append(`file${i + 1}`, file, file.name);
+      }
+      try {
+        progress.textContent = '0%';
+        const res = await axios.post('/api/upload/multipart', formData, {
+          onUploadProgress: (axiosProgressEvent) => {
+            progress.textContent = Math.floor(
+              (
+                (axiosProgressEvent.loaded / axiosProgressEvent.total) *
+                100
+              ).toString(),
+            );
+          },
+        });
+        progress.textContent = '';
+        files = null;
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  </script>
+</html>
