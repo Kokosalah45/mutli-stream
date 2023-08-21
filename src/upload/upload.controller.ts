@@ -34,6 +34,7 @@ export class UploadController {
 
     bb.on('file', (name, file, info) => {
       const { filename, encoding, mimeType } = info;
+      // owes.mp4
       const writeStream = createWriteStream(
         `uploads/${mimeType.split('/')[1]}/${filename}`,
       );
@@ -109,9 +110,11 @@ export class UploadController {
             };
             const completeMultipartUploadCommand =
               new CompleteMultipartUploadCommand(completeParams);
-            await s3.send(completeMultipartUploadCommand);
-            res.send('File uploaded successfully');
-          });
+            const response = await s3.send(completeMultipartUploadCommand);
+            parts.length = 0;
+            res.json({ message: 'File uploaded successfully', response });
+          })
+          .on('error', (err) => console.log(err));
       });
 
       bb.on('finish', async () => {

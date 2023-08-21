@@ -38,7 +38,7 @@
       }
       try {
         progress.textContent = '0%';
-        const res = await axios.post('/api/upload/multipart', formData, {
+        const res = await axios.post('/api/upload/multipart/disk', formData, {
           onUploadProgress: (axiosProgressEvent) => {
             progress.textContent = Math.floor(
               (
